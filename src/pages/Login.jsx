@@ -1,19 +1,21 @@
 import { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { useUser } from "../utils/AuthWrapper";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   const { login } = useUser();
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = (e) => {
+    e.preventDefault();
     login(loginEmail, loginPassword);
   };
 
   return (
     <>
-      <div className="relative min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-500 dark:bg-gray-700">
+      <div className="relative min-h-screen  flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-500 dark:bg-gray-700">
         <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-xl z-10">
           <div className="text-center">
             <h2 className="mt-6 text-3xl font-bold text-gray-900">
@@ -86,12 +88,12 @@ const Login = () => {
             </div>
             <p className="flex flex-col items-center justify-center mt-10 text-center text-md text-gray-500">
               <span>Don't have an account?</span>
-              <a
-                href="#"
+              <Link
+                to="/signup"
                 className="text-indigo-500 hover:text-indigo-500no-underline hover:underline cursor-pointer transition ease-in duration-300"
               >
                 Sign up
-              </a>
+              </Link>
             </p>
           </form>
         </div>
@@ -101,16 +103,3 @@ const Login = () => {
 };
 
 export default Login;
-{
-  /* <div className="flex items-center">
-  <input
-    id="remember_me"
-    name="remember_me"
-    type="checkbox"
-    className="h-4 w-4 bg-indigo-500 focus:ring-indigo-400 border-gray-300 rounded"
-  />
-  <label for="remember_me" className="ml-2 block text-sm text-gray-900">
-    Remember me
-  </label>
-</div>; */
-}

@@ -1,6 +1,12 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import AppRouter from "../router/AppRouter";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+  signOut,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "../firebase-config";
 
 const AuthContext = createContext();
@@ -9,25 +15,58 @@ export const useUser = () => {
 };
 
 const AuthWrapper = () => {
-  const [user, setUser] = useState();
+  const [user, setUser] = useState({
+    email: "",
+    username: "",
+    accessToken: "",
+  });
 
-  const register = async (email, password) => {
-    try {
-      const currentUser = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log(currentUser);
-      setUser(currentUser.user.email);
+      if (currentUser) {
+        setUser({
+          email: currentUser.email,
+          username: currentUser.displayName,
+          accessToken: currentUser.accessToken,
+        });
+      } else {
+        setUser({
+          email: "",
+          username: "",
+          accessToken: "",
+        });
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const register = async (email, password, displayName) => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(auth.currentUser, {
+        displayName,
+      });
+      // setUser({
+      //   email: auth.currentUser.email,
+      //   username: auth.currentUser.displayName,
+      //   accessToken: auth.currentUser.accessToken,
+      // });
     } catch (error) {
-      console.log("=>>>>>>", error.message);
+      console.log(error.message);
     }
   };
 
-  const login = async (email, password) => {};
+  const login = async (email, password) => {
+    try {
+      const user = await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {}
+  };
 
-  const logout = async () => {};
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   return (
     <>
